@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#176b55">
+<meta name="description" content="Track estimated potassium from foods and meals.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>K-Potassium Tracker</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#"><span class="brand-mark">K</span><span>K-Potassium Tracker<small>Daily food estimate</small></span></a>
+  <nav><button class="nav-btn active" data-page="diary">Diary</button><button class="nav-btn" data-page="foods">Food database</button><button class="nav-btn" data-page="reports">Reports</button><button class="nav-btn" data-page="health">BP & Sugar</button><button class="nav-btn" data-page="fluid">Fluid Balance</button><button class="nav-btn" data-page="manage">Data Management</button></nav>
+</header>
+<main class="container">
+  <section id="diary-page" class="page">
+    <section class="intro">
+      <div><p class="eyebrow">YOUR DAILY FOOD DIARY</p><h1>Track potassium from your meals.</h1><p class="muted">Select foods, enter portions and view estimated potassium in milligrams.</p></div>
+      <div class="date-box"><label for="diary-date">Diary date</label><input id="diary-date" type="date"></div>
+    </section>
+    <section class="summary-card">
+      <div><span class="summary-label">Estimated potassium consumed</span><div class="total"><span id="daily-total">0</span> <small>mg</small></div><p class="summary-note">Total for selected date</p></div>
+      <div class="potassium-icon">K<sup>+</sup></div>
+    </section>
+    <section class="meal-grid" id="meal-totals"></section>
+    <section class="panel">
+      <div class="panel-heading"><div><p class="eyebrow">ADD TO DIARY</p><h2>What did you eat?</h2></div></div>
+      <form id="entry-form" class="entry-form">
+        <div class="field food-field"><label for="food-select">Select food</label><select id="food-select" required></select></div>
+        <div class="field"><label for="quantity">Quantity</label><div class="quantity-wrap"><input id="quantity" type="number" min="0.1" step="0.1" placeholder="e.g. 2" required><span id="unit-label">serving</span></div></div>
+        <div class="field"><label for="meal-select">Meal</label><select id="meal-select"><option>Breakfast</option><option>Lunch</option><option>Snacks</option><option>Dinner</option></select></div>
+        <button class="primary-btn" type="submit">+ Add food</button>
+      </form>
+      <p id="food-hint" class="hint">Choose a food to see its estimated potassium per serving.</p>
+      <p id="message" class="message" role="status"></p>
+    </section>
+    <section class="panel">
+      <div class="panel-heading"><div><p class="eyebrow">FOOD RECORDS</p><h2>Food entries</h2></div><span class="count" id="entry-count">0 items</span></div>
+      <div id="entries-area"></div>
+    </section>
+    <div class="notice"><strong>Important:</strong> Values are approximate estimates. Recipe ingredients, portion size and preparation methods change potassium content. This app does not prescribe a daily target or replace professional medical advice.</div>
+  </section>
+
+  <section id="foods-page" class="page hidden">
+    <section class="intro"><div><p class="eyebrow">REFERENCE LIST</p><h1>Food database</h1><p class="muted">Estimated potassium per standard serving.</p></div></section>
+    <section class="panel">
+      <input class="search" id="food-search" type="search" placeholder="Search foods...">
+      <div id="food-table"></div>
+    </section>
+    <p class="muted small">Prepared-food values are recipe estimates. For packaged products, check the nutrition label.</p>
+  </section>
+
+  <section id="reports-page" class="page hidden">
+    <section class="intro"><div><p class="eyebrow">YOUR HISTORY</p><h1>Weekly report</h1><p class="muted">Daily estimated potassium totals for the last seven days.</p></div></section>
+    <section class="panel"><div id="weekly-report"></div></section>
+    <section class="panel">
+      <div class="panel-heading"><h2>Data backup</h2></div>
+      <p class="muted small">Export your food diary to a JSON file for safekeeping, or restore a previously exported file.</p>
+      <div class="backup-actions"><button class="secondary-btn" id="export-btn">Export diary</button><label class="secondary-btn file-label">Import diary<input type="file" id="import-file" accept="application/json"></label><button class="danger-btn" id="clear-btn">Clear all diary entries</button></div>
+    </section>
+  </section>
+<section id="health-page" class="page hidden"><section class="intro"><div><p class="eyebrow">MANUAL HEALTH LOG</p><h1>Blood pressure & blood sugar</h1><p class="muted">Record readings you have measured. This tracker stores entries; it does not diagnose or interpret them.</p></div></section><div class="health-grid"><section class="panel"><p class="eyebrow">BLOOD PRESSURE</p><h2>Add BP reading</h2><form id="bp-form" class="health-form"><div class="field"><label for="bp-systolic">Systolic (mmHg)</label><input id="bp-systolic" type="number" min="40" max="300" required placeholder="e.g. 120"></div><div class="field"><label for="bp-diastolic">Diastolic (mmHg)</label><input id="bp-diastolic" type="number" min="20" max="200" required placeholder="e.g. 80"></div><div class="field"><label for="bp-pulse">Pulse (optional, bpm)</label><input id="bp-pulse" type="number" min="20" max="250" placeholder="e.g. 72"></div><div class="field"><label for="bp-datetime">Date and time</label><input id="bp-datetime" type="datetime-local" required></div><button class="primary-btn" type="submit">+ Save BP reading</button></form><p id="bp-message" class="message"></p></section><section class="panel"><p class="eyebrow">BLOOD SUGAR</p><h2>Add glucose reading</h2><form id="sugar-form" class="health-form"><div class="field"><label for="sugar-value">Blood sugar value</label><input id="sugar-value" type="number" min="1" max="2000" step="0.1" required placeholder="Enter measured value"></div><div class="field"><label for="sugar-unit">Unit</label><select id="sugar-unit"><option>mg/dL</option><option>mmol/L</option></select></div><div class="field"><label for="sugar-context">Measurement time</label><select id="sugar-context"><option>Fasting</option><option>Before meal</option><option>1 hour after meal</option><option>2 hours after meal</option><option>Random</option><option>Bedtime</option></select></div><div class="field"><label for="sugar-datetime">Date and time</label><input id="sugar-datetime" type="datetime-local" required></div><button class="primary-btn" type="submit">+ Save sugar reading</button></form><p id="sugar-message" class="message"></p></section></div><section class="panel"><div class="panel-heading"><h2>Blood pressure history</h2><span id="bp-count" class="count">0 readings</span></div><div id="bp-history"></div></section><section class="panel"><div class="panel-heading"><h2>Blood sugar history</h2><span id="sugar-count" class="count">0 readings</span></div><div id="sugar-history"></div></section><div class="notice"><strong>Health information:</strong> Enter readings exactly as shown by your measuring device, including unit and measurement time. This log does not interpret results, diagnose conditions or provide treatment advice. Discuss readings with a qualified healthcare professional.</div></section>
+
+<section id="fluid-page" class="page hidden">
+<section class="intro"><div><p class="eyebrow">DAILY FLUID RECORD</p><h1>Fluid intake & output</h1><p class="muted">Manually record fluids consumed and measured fluid output in millilitres.</p></div></section>
+<section class="summary-card fluid-summary"><div><span class="summary-label">Net fluid balance</span><div class="total"><span id="fluid-net">0</span> <small>ml</small></div><p class="summary-note">Intake minus recorded output for selected date</p></div><div class="potassium-icon">ml</div></section>
+<div class="meal-grid"><div class="meal-chip"><span>Total fluid intake</span><strong id="fluid-intake-total">0 ml</strong></div><div class="meal-chip"><span>Total fluid output</span><strong id="fluid-output-total">0 ml</strong></div></div>
+<section class="panel"><div class="panel-heading"><div><p class="eyebrow">ADD MEASUREMENT</p><h2>Record fluid intake or output</h2></div></div>
+<form id="fluid-form" class="entry-form fluid-form">
+<div class="field"><label for="fluid-type">Record type</label><select id="fluid-type"><option value="intake">Fluid intake (+)</option><option value="output">Fluid output (−)</option></select></div>
+<div class="field"><label for="fluid-category">Category</label><select id="fluid-category"></select></div>
+<div class="field"><label for="fluid-amount">Amount (ml)</label><input id="fluid-amount" type="number" min="1" max="20000" step="1" placeholder="e.g. 250" required></div>
+<div class="field"><label for="fluid-datetime">Date and time</label><input id="fluid-datetime" type="datetime-local" required></div>
+<button class="primary-btn" type="submit">+ Save measurement</button></form><p id="fluid-message" class="message" role="status"></p></section>
+<section class="panel"><div class="panel-heading"><div><p class="eyebrow">DAILY HISTORY</p><h2>Fluid records</h2></div><span class="count" id="fluid-count">0 entries</span></div><div id="fluid-history"></div></section>
+<div class="notice"><strong>Important:</strong> This is a simple record of manually entered fluid intake and measured output. It does not account for fluid in foods, unmeasured losses or clinical factors, and it does not set a fluid goal. Follow any fluid restrictions or monitoring instructions given by your healthcare professional.</div>
+</section>
+
+
+<section id="manage-page" class="page hidden">
+  <section class="intro"><div><p class="eyebrow">DATABASE CONTROL CENTRE</p><h1>Data management</h1><p class="muted">Add, retrieve, back up, restore, delete and reset your locally stored records.</p></div></section>
+  <section class="panel cloud-panel">
+    <div class="panel-heading"><div><p class="eyebrow">SUPABASE CLOUD BACKUP</p><h2>Account & cloud synchronisation</h2></div><span id="cloud-status" class="count">Not signed in</span></div>
+    <p class="muted small">Create an account or sign in with your email. Cloud backup is manual: choose Upload to save this device's records, or Download to replace this device's records with the saved cloud backup.</p>
+    <form id="cloud-auth-form" class="health-form cloud-auth-form">
+      <div class="field"><label for="cloud-email">Email address</label><input id="cloud-email" type="email" autocomplete="email" required placeholder="you@example.com"></div>
+      <div class="field"><label for="cloud-password">Password</label><input id="cloud-password" type="password" autocomplete="current-password" minlength="8" required placeholder="At least 8 characters"></div>
+      <button class="primary-btn" type="submit" id="cloud-signin">Sign in</button>
+      <button class="secondary-btn" type="button" id="cloud-signup">Create account</button>
+    </form>
+    <div class="backup-actions cloud-actions">
+      <button class="secondary-btn" id="cloud-upload" type="button" disabled>Upload this device to cloud</button>
+      <button class="secondary-btn" id="cloud-download" type="button" disabled>Download cloud backup</button>
+      <button class="danger-btn" id="cloud-signout" type="button" disabled>Sign out</button>
+    </div>
+    <p id="cloud-message" class="message" role="status"></p>
+    <p class="notice"><strong>Privacy:</strong> Cloud backup includes food diary, custom foods, blood pressure, blood sugar and fluid records. Only use real health records after discussing cloud storage with a parent/guardian and considering who can access the account. Do not share your password. Upload and download replace the complete backup; export a local backup first.</p>
+  </section>
+  <section class="panel">
+    <div class="panel-heading"><div><p class="eyebrow">LOCAL STORAGE</p><h2>Stored records overview</h2></div><button class="secondary-btn" id="refresh-storage">Refresh</button></div>
+    <div class="meal-grid storage-grid">
+      <div class="meal-chip"><span>Food diary entries</span><strong id="store-food">0</strong></div>
+      <div class="meal-chip"><span>Custom foods</span><strong id="store-custom-foods">0</strong></div>
+      <div class="meal-chip"><span>Blood pressure</span><strong id="store-bp">0</strong></div>
+      <div class="meal-chip"><span>Blood sugar</span><strong id="store-sugar">0</strong></div>
+      <div class="meal-chip"><span>Fluid records</span><strong id="store-fluid">0</strong></div>
+      <div class="meal-chip"><span>Estimated browser storage</span><strong id="store-size">0 KB</strong></div>
+    </div>
+    <p class="hint">Data is stored in this browser on this device. It is not automatically shared or synced with another phone or computer.</p>
+  </section>
+  <section class="panel">
+    <div class="panel-heading"><div><p class="eyebrow">ADD TO FOOD DATABASE</p><h2>Add a custom food</h2></div></div>
+    <form id="custom-food-form" class="health-form">
+      <div class="field"><label for="custom-food-name">Food name</label><input id="custom-food-name" maxlength="70" required placeholder="e.g. Homemade vegetable kurma"></div>
+      <div class="field"><label for="custom-food-serving">Serving description</label><input id="custom-food-serving" maxlength="50" required placeholder="e.g. 1 small bowl"></div>
+      <div class="field"><label for="custom-food-unit">Quantity unit label</label><input id="custom-food-unit" maxlength="20" required placeholder="e.g. bowl"></div>
+      <div class="field"><label for="custom-food-potassium">Potassium per serving (mg)</label><input id="custom-food-potassium" type="number" min="0" max="10000" step="0.1" required placeholder="Enter verified estimate"></div>
+      <button class="primary-btn" type="submit">+ Add food to database</button>
+    </form>
+    <p id="custom-food-message" class="message" role="status"></p>
+  </section>
+  <section class="panel">
+    <div class="panel-heading"><div><p class="eyebrow">CUSTOM DATABASE</p><h2>Manage added foods</h2></div><span id="custom-food-count" class="count">0 foods</span></div>
+    <div id="custom-food-list"></div>
+  </section>
+  <section class="panel">
+    <div class="panel-heading"><div><p class="eyebrow">BACKUP & RESTORE</p><h2>Store and retrieve your data</h2></div></div>
+    <p class="muted small">Export creates a backup file containing food diary, custom foods, blood pressure, blood sugar and fluid records. Import restores records from a compatible backup and replaces the current records.</p>
+    <div class="backup-actions"><button class="secondary-btn" id="manage-export">Export full backup</button><label class="secondary-btn file-label">Restore from backup<input type="file" id="manage-import" accept="application/json"></label></div>
+    <p id="backup-message" class="message" role="status"></p>
+  </section>
+  <section class="panel">
+    <div class="panel-heading"><div><p class="eyebrow">DELETE & RESET</p><h2>Clear stored records</h2></div></div>
+    <p class="muted small">These actions permanently delete the selected records from this browser. Export a backup before resetting.</p>
+    <div class="backup-actions">
+      <button class="danger-btn" id="reset-food">Delete food diary</button>
+      <button class="danger-btn" id="reset-bp-sugar">Delete BP & sugar records</button>
+      <button class="danger-btn" id="reset-fluid">Delete fluid records</button>
+      <button class="danger-btn" id="reset-custom-foods">Delete custom foods</button>
+      <button class="danger-btn" id="reset-all">Reset all app data</button>
+    </div>
+    <p id="reset-message" class="message" role="status"></p>
+  </section>
+</section>
+
+</main>
+<footer>Runs in your browser. Diary data stays in this browser unless you export it.</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(console.error));
+}
+</script>
+</body>
+</html>
